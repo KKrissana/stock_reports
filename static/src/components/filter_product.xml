@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+   <t t-name="stock_reports.StockReportFilterProducts">
+       <Dropdown
+           menuClass="'account_report_filter product'">
+           <button class="btn btn-secondary">
+               <i class="fa fa-cubes me-1"/>Products
+           </button>
+           <t t-set-slot="content">
+               <div class="dropdown-item gap-2 align-items-center">
+                   <label>Products</label>
+                   <MultiRecordSelector t-props="getMultiRecordSelectorProps('product.product', 'product_ids')"/>
+               </div>
+               <div class="dropdown-item gap-2 align-items-center">
+                   <label>Categories</label>
+                   <MultiRecordSelector t-props="getMultiRecordSelectorProps('product.category', 'product_categories')"/>
+               </div>
+           </t>
+       </Dropdown>
+   </t>
+</templates>

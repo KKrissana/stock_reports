@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem 
+        id="menu_stock_audit_report"
+        name="Audit Reports"
+        parent="stock.menu_warehouse_report"
+        groups="stock_reports.group_stock_audit_report"
+        sequence="500"/>
+
+    <menuitem 
+        id="menu_action_stock_aged_report"
+        name="Stock Aging"
+        action="action_stock_aged_report"
+        parent="stock_reports.menu_stock_audit_report" 
+        groups="stock_reports.group_stock_audit_report"
+        sequence="510" />
+
+    <menuitem 
+        id="menu_action_stock_incoming_report"
+        name="Stock Incoming"
+        action="action_stock_incoming_report"
+        parent="stock_reports.menu_stock_audit_report" 
+        groups="stock_reports.group_stock_audit_report"
+        sequence="520" />
+
+    <menuitem 
+        id="menu_action_stock_outgoing_report"
+        name="Stock Outgoing"
+        action="action_stock_outgoing_report"
+        parent="stock_reports.menu_stock_audit_report" 
+        groups="stock_reports.group_stock_audit_report"
+        sequence="530" />
+
+    <menuitem 
+        id="menu_action_stock_valuation_report"
+        name="Stock Valuation"
+        action="action_stock_valuation_report"
+        parent="stock_reports.menu_stock_audit_report" 
+        groups="stock_reports.group_stock_valuation_report"
+        sequence="550" />
+              
+</odoo>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+    
+    <!-- Inherit AccountReportFilterExtraOptions -->
+    <t t-name="stock_reports.StockMoveFilterExtraOptions" t-inherit="account_reports.AccountReportFilterExtraOptions" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='controller.options.integer_rounding']" position="after">
+ 
+            <t t-if="['incoming', 'outgoing'].includes(controller.options['stock_grouping'])">
+                <div class="dropdown-divider" />
+                <DropdownItem t-if="['incoming'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.receipt_stock }"
+                    onSelected="() => this.filterClicked({ optionKey: 'receipt_stock', reload: true})"
+                    closingMode="'none'" >
+                    Receipts
+                </DropdownItem>
+                <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.delivery_stock }"
+                    onSelected="() => this.filterClicked({ optionKey: 'delivery_stock', reload: true})"
+                    closingMode="'none'" >
+                    Deliveries
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.return_from_customer }"
+                    onSelected="() => this.filterClicked({ optionKey: 'return_from_customer', reload: true})"
+                    closingMode="'none'" >
+                    Returns from customer
+                </DropdownItem>
+                <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.return_from_production }"
+                    onSelected="() => this.filterClicked({ optionKey: 'return_from_production', reload: true})"
+                    closingMode="'none'" >
+                    Returns from production
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.return_to_vendor }"
+                    onSelected="() => this.filterClicked({ optionKey: 'return_to_vendor', reload: true})"
+                    closingMode="'none'" >
+                    Returns to vendor
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.inventory_loss }"
+                    onSelected="() => this.filterClicked({ optionKey: 'inventory_loss', reload: true})"
+                    closingMode="'none'" >
+                    Inventory loss/adjustment 
+                </DropdownItem>
+            </t>
+
+            <t t-if="['incoming', 'outgoing'].includes(controller.options['stock_grouping'])">
+                <div class="dropdown-divider" />
+                <DropdownItem
+                    class="{ 'selected': controller.options.show_origin }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_origin', reload: true})"
+                    closingMode="'none'" >
+                    Show Source
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.show_partner }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_partner', reload: true})"
+                    closingMode="'none'" >
+                    Show Partner
+                </DropdownItem>
+                <DropdownItem t-if="['incoming'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.show_inv_note }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_inv_note', reload: true})"
+                    closingMode="'none'" >
+                    Show Invoice/Delivery Note
+                </DropdownItem>
+                <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.show_machine }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_machine', reload: true})"
+                    closingMode="'none'" >
+                    Show Machine/Equipment
+                </DropdownItem>
+                <DropdownItem t-if="'display_analytic' in controller.options"
+                    class="{ 'selected': controller.options.show_analytic_account }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_analytic_account', reload: true})"
+                    closingMode="'none'" >
+                    Show Analytic Account
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.show_stock_account }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_stock_account', reload: true})"
+                    closingMode="'none'" >
+                    Show Stock Account
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.show_counterpart_account }"
+                    onSelected="() => this.filterClicked({ optionKey: 'show_counterpart_account', reload: true})"
+                    closingMode="'none'" >
+                    Show Counterpart Account
+                </DropdownItem>
+            </t>
+        </xpath>
+    </t>
+
+</template>

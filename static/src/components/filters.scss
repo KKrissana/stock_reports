@@ -1,0 +1,20 @@
+.account_report_filter {
+    &.product, &.picking {
+        .dropdown {
+            display: inherit;
+        }
+        .dropdown-item {
+            display: flex;
+            label { width: 60px }
+        }
+        .dropdown-item.focus, .dropdown-item.selected:hover, .dropdown-item.selected:focus { background-color: inherit; }
+        .o_input_dropdown { width: 100% }
+        .o_field_tags {
+            margin-left: 8px;
+            flex-direction: column;
+            flex-grow: 9;
+
+            .o_tag { width: fit-content }
+        }
+    }
+}
