@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="stock_reports.StockReportGroupBy">
+        <Dropdown>
+            <button class="btn btn-secondary">
+                <i class="fa fa-list me-1"/>
+                <t t-if="controller.options.stock_grouping_field === 'account_id'">
+                    Group by Account
+                </t>
+                <t t-if="controller.options.stock_grouping_field === 'analytic' and ['incoming', 'outgoing'].includes(controller.options['stock_grouping'])">
+                    Group by Analytic
+                </t>
+                <t t-elif="controller.options.stock_grouping_field === 'none'">
+                    No Grouping
+                </t>
+            </button>
+
+            <t t-set-slot="content">
+                <DropdownItem
+                    class="{ 'selected': controller.options.stock_grouping_field === 'account_id' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_grouping_field', optionValue: 'account_id', reload: true})" >
+                    Group By Account
+                </DropdownItem>
+                <DropdownItem t-if="'display_analytic' in controller.options"
+                    class="{ 'selected': controller.options.stock_grouping_field === 'analytic' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_grouping_field', optionValue: 'analytic', reload: true})" >
+                    Group By Analytic
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.stock_grouping_field === 'none'}"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_grouping_field', optionValue: 'none', reload: true})"  >
+                    No Grouping
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+    <t t-name="stock_reports.StockReportValuationType" >
+        <Dropdown>
+            <button class="btn btn-secondary">
+                <i class="fa fa-file me-1"/>
+                <t t-if="controller.options.stock_valuation_type === 'all'">
+                    Valuation: All
+                </t>
+                <t t-elif="controller.options.stock_valuation_type === 'manual_periodic'">
+                    Valuation: Manual
+                </t>
+                <t t-elif="controller.options.stock_valuation_type === 'real_time'">
+                    Valuation: Automated
+                </t>
+            </button>
+
+            <t t-set-slot="content">
+                <DropdownItem
+                    class="{ 'selected': controller.options.stock_valuation_type === 'all' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_valuation_type', optionValue: 'all', reload: true})">
+                    All
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.stock_valuation_type === 'manual_periodic'}"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_valuation_type', optionValue: 'manual_periodic', reload: true})">
+                    Manual
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.stock_valuation_type === 'real_time' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'stock_valuation_type', optionValue: 'real_time', reload: true})">
+                    Automated
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+    <!-- template for Aged Stock Reports-->
+    <t t-name="stock_reports.AgedStockBaseOn">
+        <Dropdown>
+            <button class="btn btn-secondary">
+                <i class="fa fa-clock-o me-1"/>
+                <t t-if="controller.options.aged_stock_base_on === 'movement'">
+                    Based on Movement
+                </t>
+                <t t-elif="controller.options.aged_stock_base_on === 'incoming'">
+                    Based on Incoming
+                </t>
+                <t t-elif="controller.options.aged_stock_base_on === 'outgoing'">
+                    Based on Outgoing
+                </t>
+                
+            </button>
+
+            <t t-set-slot="content">
+                <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_base_on === 'movement'}"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_base_on', optionValue: 'movement', reload: true})"
+                >
+                    Based on Movement
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_base_on === 'incoming' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_base_on', optionValue: 'incoming', reload: true})"
+                >
+                    Based on Incoming
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_base_on === 'outgoing' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_base_on', optionValue: 'outgoing', reload: true})"
+                >
+                    Based on Outgoing
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+    <t t-name="stock_reports.AgedStockProductControl">
+        <Dropdown>
+            <button class="btn btn-secondary">
+                <i class="fa fa-folder-open me-1"/>
+                <t t-if="controller.options.aged_stock_product_control === 'all'">
+                    Stock Rules: All
+                </t>
+                <t t-elif="controller.options.aged_stock_product_control === 'none'">
+                    Stock Rules: None
+                </t>
+                <t t-elif="controller.options.aged_stock_product_control === 'orderpoint'">
+                    Stock Rules: Min-Max
+                </t>
+            </button>
+
+            <t t-set-slot="content">
+                <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_product_control === 'all' }"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_product_control', optionValue: 'all', reload: true})" >
+                    Stock Rules: All
+                </DropdownItem>
+                 <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_product_control === 'none'}"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_product_control', optionValue: 'none', reload: true})" >
+                    Stock Rules: None
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.aged_stock_product_control === 'orderpoint'}"
+                    onSelected="() => this.filterClicked({ optionKey: 'aged_stock_product_control', optionValue: 'orderpoint', reload: true})" >
+                    Stock Rules: Min-Max
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+
+    <t t-name="stock_reports.AgingStockInterval">
+        <Dropdown
+            menuClass="'account_report_filter intervals'"
+        >
+            <button class="btn btn-secondary">
+                <i class="fa fa-calendar-o me-1"/>
+                <t t-out="controller.options.aged_stock_interval"/> Days
+            </button>
+            <t t-set-slot="content">
+                <div class="dropdown-item interval">
+                    <input
+                        min="1"
+                        type="number"
+                        t-att-value="controller.options.aged_stock_interval"
+                        t-on-change="(ev) => this.setAgingStockInterval(ev)"
+                    />
+                    <span class="mx-2">Days</span>
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+
+
+</templates>

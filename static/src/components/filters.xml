@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="stock_reports.AccountReportFiltersCustomizable" 
+        t-inherit="account_reports.AccountReportFiltersCustomizable"
+        t-inherit-mode="extension">
+
+        <xpath expr="//t[@t-if='hasExtraOptionsFilter']" position="before">
+            <t t-if="'picking' in controller.options">
+                <div id="filter_picking" class="filter_picking">
+                    <t t-call="stock_reports.StockReportFilterPickings"/>
+                </div>
+            </t>
+
+            <t t-if="'product' in controller.options">
+                <div id="filter_product" class="filter_product">
+                    <t t-call="stock_reports.StockReportFilterProducts"/>
+                </div>
+            </t>
+
+            <t t-if="'stock_valuation_type' in controller.options">
+                <div id="filter_stock_valuation_type" class="filter_stock_valuation_type">
+                    <t t-call="stock_reports.StockReportValuationType"/>
+                </div>
+            </t>
+
+            <t t-if="['incoming', 'outgoing', 'valuation'].includes(controller.options['stock_grouping'])">
+                <div id="filter_stock_grouping_field" class="stock_grouping_field">
+                    <t t-call="stock_reports.StockReportGroupBy"/>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+    <!-- <t t-name="stock_reports.StockMoveFilters" t-inherit="account_reports.AccountReportFiltersCustomizable" >
+
+        <xpath expr="//div[@id='filter_extra_options']" position="replace">
+            <t t-call="stock_reports.StockMoveFilterExtraOptions"/>
+        </xpath>
+    </t> -->
+
+    <t t-name="stock_reports.AgedStockFilters" t-inherit="account_reports.AccountReportFiltersCustomizable" >
+
+        <xpath expr="//div[@id='filter_product']" position="after">
+           
+            <t i-if="aged_stock_base_on in controller.options">
+                <div id="filter_aged_stock_base_on">
+                    <t t-call="stock_reports.AgedStockBaseOn"/>
+                </div>
+            </t>
+            
+            <t i-if="aged_stock_product_control in controller.options">
+                <div id="filter_aged_stock_product_control">
+                    <t t-call="stock_reports.AgedStockProductControl"/>
+                </div>
+            </t>
+
+            <t i-if="aged_stock_interval in controller.options">
+                <div id="filter_aged_stock_interval">
+                    <t t-call="stock_reports.AgingStockInterval"/>
+                </div>
+            </t>
+
+        </xpath>
+    </t>
+</templates>

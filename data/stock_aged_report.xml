@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+     <record id="stock_aged_report" model="account.report">
+        <field name="name">Aged Stock</field>
+        <field name="default_opening_date_filter">today</field>
+        <field name="filter_hierarchy">never</field>
+        <field name="filter_date_range" eval="False"/>
+        <field name="filter_unfold_all" eval="False"/>
+        <field name="filter_show_draft" eval="False"/>
+        <field name="filter_period_comparison" eval="False"/>
+        <field name="filter_journals" eval="False"/>
+        <field name="filter_product" eval="True" />
+        <field name="filter_picking" eval="False" />
+        <field name="filter_hide_0_lines">never</field>
+        <field name="custom_handler_model_id" ref="model_stock_aged_report_handler"/>
+        <field name="load_more_limit" eval="80"/>
+        <field name="column_ids">
+            <record id="stock_aged_report_days" model="account.report.column">
+                <field name="name">Days</field>
+                <field name="expression_label">days</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">100</field>
+            </record>
+            <record id="stock_aged_report_min" model="account.report.column">
+                <field name="name">Min</field>
+                <field name="expression_label">reordering_min_qty</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">110</field>
+            </record>
+            <record id="stock_aged_report_max" model="account.report.column">
+                <field name="name">Max</field>
+                <field name="expression_label">reordering_max_qty</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">120</field>
+            </record>
+
+            <record id="stock_aged_report_total_qty" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">total_qty</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">130</field>
+            </record>
+            <record id="stock_aged_report_total_value" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">total_value</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">140</field>
+            </record>
+            
+            <record id="stock_aged_report_qty_period1" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period1</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">170</field>
+            </record>
+            <record id="stock_aged_report_value_period1" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period1</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">180</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period2" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period2</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">190</field>
+            </record>
+            <record id="stock_aged_report_value_period2" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period2</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">200</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period3" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period3</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">210</field>
+            </record>
+            <record id="stock_aged_report_value_period3" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period3</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">220</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period4" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period4</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">230</field>
+            </record>
+            <record id="stock_aged_report_value_period4" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period4</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">240</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period5" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period5</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">250</field>
+            </record>
+            <record id="stock_aged_report_value_period5" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period5</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">260</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period6" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period6</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">270</field>
+            </record>
+            <record id="stock_aged_report_value_period6" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period6</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">280</field>
+            </record>
+
+            <record id="stock_aged_report_qty_period7" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">qty_period7</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">290</field>
+            </record>
+            <record id="stock_aged_report_value_period7" model="account.report.column">
+                <field name="name">Value</field>
+                <field name="expression_label">value_period7</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">300</field>
+            </record>
+
+            
+        </field>
+    </record>
+
+</odoo>

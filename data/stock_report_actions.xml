@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_stock_aged_report" model="ir.actions.client">
+        <field name="name">Stock Aging</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('stock_reports.stock_aged_report')}"/>
+    </record>
+
+    <record id="action_stock_incoming_report" model="ir.actions.client">
+        <field name="name">Stock Incoming</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('stock_reports.stock_incoming_report')}"/>
+    </record>
+
+    <record id="action_stock_outgoing_report" model="ir.actions.client">
+        <field name="name">Stock Outgoing</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('stock_reports.stock_outgoing_report')}"/>
+    </record>
+
+    <record id="action_stock_valuation_report" model="ir.actions.client">
+        <field name="name">Stock Valuation</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('stock_reports.stock_valuation_report')}"/>
+    </record>
+
+</odoo>

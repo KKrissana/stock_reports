@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_incoming_report" model="account.report">
+        <field name="name">Stock Incoming</field>
+        <field name="default_opening_date_filter">previous_month</field>
+        <field name="filter_hierarchy">never</field>
+        <field name="filter_date_range" eval="True"/>
+        <field name="filter_unfold_all" eval="True"/>
+        <field name="filter_show_draft" eval="False"/>
+        <field name="filter_period_comparison" eval="False"/>
+        <field name="filter_journals" eval="False"/>
+        <field name="filter_product" eval="True" />
+        <field name="filter_picking" eval="True" />
+        <field name="filter_hide_0_lines">never</field>
+        <field name="custom_handler_model_id" ref="model_stock_incoming_report_handler"/>
+        <field name="load_more_limit" eval="80"/>
+        <field name="column_ids">
+            <record id="stock_incoming_report_days" model="account.report.column">
+                <field name="name">Date</field>
+                <field name="expression_label">date</field>
+                <field name="figure_type">date</field>
+                <field name="sequence">100</field>
+            </record>
+            <record id="stock_incoming_report_reference" model="account.report.column">
+                <field name="name">Reference</field>
+                <field name="expression_label">reference</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">110</field>
+            </record>
+            <record id="stock_incoming_report_origin" model="account.report.column">
+                <field name="name">Source</field>
+                <field name="expression_label">origin</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">120</field>
+            </record>
+            <record id="stock_incoming_report_partner" model="account.report.column">
+                <field name="name">Partner</field>
+                <field name="expression_label">partner</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">130</field>
+            </record>
+            <record id="stock_incoming_report_quantity" model="account.report.column">
+                <field name="name">Quantity</field>
+                <field name="expression_label">quantity</field>
+                <field name="figure_type">float</field>
+                <field name="sequence">140</field>
+            </record>
+            <record id="stock_incoming_report_price" model="account.report.column">
+                <field name="name">Unit Value</field>
+                <field name="expression_label">unit_cost</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">150</field>
+            </record>
+            <record id="stock_incoming_report_uom" model="account.report.column">
+                <field name="name">UoM</field>
+                <field name="expression_label">uom</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">160</field>
+            </record>
+            <record id="stock_incoming_report_value" model="account.report.column">
+                <field name="name">Total Value</field>
+                <field name="expression_label">value</field>
+                <field name="figure_type">monetary</field>
+                <field name="sequence">170</field>
+            </record>
+            <record id="stock_incoming_report_inv" model="account.report.column">
+                <field name="name">Invoice/Delivery Note</field>
+                <field name="expression_label">inv_note</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">180</field>
+            </record>
+            <record id="stock_incoming_analytic_account" model="account.report.column">
+                <field name="name">Analytic</field>
+                <field name="expression_label">analytic_account</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">190</field>
+            </record>
+            <record id="stock_incoming_report_stock_account" model="account.report.column">
+                <field name="name">Stock Account</field>
+                <field name="expression_label">stock_account</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">200</field>
+            </record>
+            <record id="stock_incoming_report_counterpart_account" model="account.report.column">
+                <field name="name">Counterpart Account</field>
+                <field name="expression_label">counterpart_account</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">210</field>
+            </record>
+            <record id="stock_incoming_report_remark" model="account.report.column">
+                <field name="name">Remark</field>
+                <field name="expression_label">remark</field>
+                <field name="figure_type">string</field>
+                <field name="sequence">220</field>
+            </record>
+        </field>
+    </record>
+
+</odoo>

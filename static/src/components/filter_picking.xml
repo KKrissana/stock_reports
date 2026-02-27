@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+   <t t-name="stock_reports.StockReportFilterPickings">
+       <Dropdown
+           menuClass="'account_report_filter picking'">
+           <button class="btn btn-secondary">
+               <i class="fa fa-tags me-1"/>Pickings
+           </button>
+           <t t-set-slot="content">
+               <div class="dropdown-item gap-2 align-items-center">
+                   <label>Pickings</label>
+                   <MultiRecordSelector t-props="getMultiRecordSelectorProps('stock.picking', 'picking_ids')"/>
+               </div>
+           </t>
+       </Dropdown>
+   </t>
+</templates>
