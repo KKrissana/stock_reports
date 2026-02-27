@@ -20,7 +20,7 @@ Stock Reports
         'views/stock_valuation_report_views.xml',
 
         'data/stock_aged_report.xml',
-        'data/stock_Incoming_report.xml',
+        'data/stock_incoming_report.xml',
         'data/stock_outgoing_report.xml',
         'data/stock_valuation_report.xml',
         'data/stock_report_actions.xml',
