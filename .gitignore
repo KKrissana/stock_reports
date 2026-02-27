@@ -1,0 +1,30 @@
+# my ignore
+.git
+
+# Thumbnails
+._*
+
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+### Python ###
+# compiled python files
+*.py[co]
+__pycache__/
