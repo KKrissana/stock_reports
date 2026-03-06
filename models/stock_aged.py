@@ -47,6 +47,7 @@ class AgedStockCustomHandle(models.AbstractModel):
         # get value 
         products, product_moves = self._get_values(report, options)
         totals = self._get_calc_columns(options)
+        last_period_column = len(report.column_ids.filtered(lambda c: "value_period" in c.expression_label))
 
         # calculate for total line and group line
         for move in product_moves:
@@ -61,9 +62,9 @@ class AgedStockCustomHandle(models.AbstractModel):
                 if expr_label in totals.keys() :
                     column_value = 0
                     if "qty_period" in expr_label:
-                        column_value = self._get_period_column_value(product, "qty_period", expr_label, interval, days)
+                        column_value = self._get_period_column_value(product, "qty_period", expr_label, interval, days, last_period_column)
                     elif "value_period" in expr_label:
-                        column_value = self._get_period_column_value(product, "value_period", expr_label, interval, days)
+                        column_value = self._get_period_column_value(product, "value_period", expr_label, interval, days, last_period_column)
                     elif "total" in expr_label:
                         column_value = product["qty_available"] if "qty" in expr_label else product["value_svl"]
 
@@ -90,7 +91,7 @@ class AgedStockCustomHandle(models.AbstractModel):
         lines.append({
             'id': report._get_generic_line_id(None, None, markup='total'),
             'name': _('Total'),
-            'level': 1,
+            'level': 0,
             'columns': columns,
         })
 
@@ -199,12 +200,13 @@ class AgedStockCustomHandle(models.AbstractModel):
         )
         return products, product_moves
     
-    def _get_period_column_value(self, product, key, expr_label, interval, days):
+    def _get_period_column_value(self, product, key, expr_label, interval, days, last_period_column):
         column_value, period_number = 0.0, 0
         if key in expr_label:
             period_number = int(expr_label.replace(key, ""))
             max_day_period = period_number * interval
-            if (max_day_period - interval) < days <= max_day_period:
+            if (max_day_period - interval) < days <= max_day_period \
+                or (period_number == last_period_column and days > max_day_period):
                 column_value = product["qty_available"] if "qty" in key else product["value_svl"]
         return column_value
 
@@ -221,7 +223,7 @@ class AgedStockCustomHandle(models.AbstractModel):
                 total_columns[expr_label] = 0
         return total_columns
 
-    def _get_report_line (self, report, options, parent_line_id, line_dic, move_dic, as_of_datetime):
+    def _get_report_line (self, report, options, parent_line_id, line_dic, move_dic, as_of_datetime, last_period_column):
         company_currency = self.env.company.currency_id
         quantity_digits = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         interval = options['aged_stock_interval']
@@ -239,9 +241,9 @@ class AgedStockCustomHandle(models.AbstractModel):
                 column_value = days
                 days = days if days else 1 
             elif "qty_period" in expr_label:
-                column_value = self._get_period_column_value(line_dic, "qty_period", expr_label, interval, days)
+                column_value = self._get_period_column_value(line_dic, "qty_period", expr_label, interval, days, last_period_column)
             elif "value_period" in expr_label:
-                column_value = self._get_period_column_value(line_dic, "value_period", expr_label, interval, days)
+                column_value = self._get_period_column_value(line_dic, "value_period", expr_label, interval, days, last_period_column)
             elif "total" in expr_label:
                 column_value = line_dic["qty_available"] if "qty" in expr_label else line_dic["value_svl"]
             else:
@@ -257,7 +259,8 @@ class AgedStockCustomHandle(models.AbstractModel):
             'parent_id': parent_line_id,
             'unfoldable': False,
             'unfolded': False,
-            'caret_options': 'stock.reports'
+            'caret_options': 'stock.reports',
+            'maxCharacters': MAX_NAME_LENGTH,
         }
         # set title
         if len(name) > MAX_NAME_LENGTH:
@@ -271,6 +274,7 @@ class AgedStockCustomHandle(models.AbstractModel):
         as_of_datetime = datetime.combine(datetime.strptime(options['date']['date_to'], DATE_FORMAT).date(), time.max)
         
         # get line values
+        last_period_column = len(report.column_ids.filtered(lambda c: "value_period" in c.expression_label))
         has_more = False
         line_counter = 0
         limit_to_load = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
@@ -281,7 +285,7 @@ class AgedStockCustomHandle(models.AbstractModel):
                 has_more = True
                 break
             product = products.filtered(lambda p: p.id == move["product_id"][0])
-            lines.append(self._get_report_line(report, options, line_dict_id, product, move, as_of_datetime))
+            lines.append(self._get_report_line(report, options, line_dict_id, product, move, as_of_datetime, last_period_column))
 
         return {
             'lines': lines,

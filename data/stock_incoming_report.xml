@@ -77,7 +77,7 @@
                 <field name="sequence">190</field>
             </record>
             <record id="stock_incoming_report_stock_account" model="account.report.column">
-                <field name="name">Stock Account</field>
+                <field name="name">Valuation Account</field>
                 <field name="expression_label">stock_account</field>
                 <field name="figure_type">string</field>
                 <field name="sequence">200</field>

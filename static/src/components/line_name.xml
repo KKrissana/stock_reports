@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+    <t t-name="stock_reports.StockReportLineName" t-inherit="account_reports.AccountReportLineNameCustomizable">
+
+        <xpath expr="//div[@data-id='content']/t[@t-component]" position="replace">
+            <t t-component="env.component('AccountReportEllipsis')" t-props="{
+                name: props.line.name?.toString(),
+                type: 'string',
+                maxCharacters: 'maxCharacters' in props.line ? props.line.maxCharacters : 80,
+             }"/>
+        </xpath>
+    </t>
+    
+</template>
