@@ -126,29 +126,44 @@ class AccountReport(models.Model):
         }
     
     def open_picking(self, options, params):
-        self.env['stock.picking'].check_access_rights('read')
+        model = self.env['stock.picking']
         report = self.env['account.report'].browse(options['report_id'])
         markup = report._get_markup(params.get('line_id'))
-        if not markup and not markup.get("stock.picking"):
+        if not markup:
             raise UserError(_("Wrong ID for report line to open: %s", params.get('line_id')))
         
-        picking = self.env['stock.picking'].browse(markup.get("stock.picking"))
-        view_id = self.env.ref('stock.view_picking_form').id
+        if markup.get("stock.picking"):
+            model = self.env['stock.picking']
+            view = self.env.ref('stock.view_picking_form')
+        elif markup.get("mrp.unbuild"):
+            model = self.env['mrp.unbuild']
+            view = self.env.ref('mrp.mrp_unbuild_form_view')
+        elif markup.get("mrp.production"):
+            model = self.env['mrp.production']
+            view = self.env.ref('mrp.mrp_production_form_view')
+        else:
+            raise UserError(_("The record linked to this line is not a picking, unbuild or manufacturing order."))
+
+        model.check_access_rights('read')
+        res = model.browse(markup.get(model._name))
+        if not res.exists():   
+            raise UserError(_("The record linked to this line no longer exists. It may have been deleted."))
+
         return {
-            'name': picking.display_name,
+            'name': res.display_name,
             'type': 'ir.actions.act_window',
-            'res_model': 'stock.picking',
+            'res_model': res._name,
             'view_mode': 'form',
-            'view_id': view_id,
-            'views': [(view_id, 'form')],
-            'res_id': picking.id,
+            'view_id': view.id,
+            'views': [(view.id, 'form')],
+            'res_id': res.id,
         }
     
     def open_stock_move(self, options, params):
         self.env['stock.move'].check_access_rights('read')
         report = self.env['account.report'].browse(options['report_id'])
         markup = report._get_markup(params.get('line_id'))
-        if not markup and not markup.get("stock.move"):
+        if not markup or not markup.get("stock.move"):
             raise UserError(_("Wrong ID for report line to open: %s", params.get('line_id')))
         
         move = self.env['stock.move'].browse(markup.get('stock.move'))
@@ -166,33 +181,28 @@ class AccountReport(models.Model):
     def open_order_line(self, options, params=None):
         report = self.env['account.report'].browse(options['report_id'])
         markup = report._get_markup(params.get('line_id'))
-        view_id = False
-        order_line_id = False
-        order_line_model = ""
+
+        model = self.env['sale.order.line']
         if markup.get("purchase.order.line"):
-            order_line_model = "purchase.order.line"
-            order_line_id = markup.get("purchase.order.line")
-            view_id = self.env.ref('purchase.purchase_order_line_form2').id
+            model = self.env["purchase.order.line"]
+            view = self.env.ref('purchase.purchase_order_line_form2')
         elif markup.get("sale.order.line"):
-            order_line_model = "sale.order.line"
-            order_line_id = markup.get("sale.order.line")
-            view_id = self.env.ref('sale.sale_order_line_view_form_readonly').id
-        
-        if not order_line_id:
+            model = self.env["sale.order.line"]
+            view = self.env.ref('sale.sale_order_line_view_form_readonly')
+        else:
             raise UserError(_("Wrong ID for report line to open: %s", params.get('line_id')))
         
-        self.env[order_line_model].check_access_rights('read')
-        order_line = self.env[order_line_model].browse(order_line_id)
+        model.check_access_rights('read')
+        order_line = model.browse(markup.get(model._name))
         return {
             'name': '%s, %s' % (order_line.order_id.display_name, order_line.product_id.display_name),
             'type': 'ir.actions.act_window',
-            'res_model': order_line_model,
+            'res_model': order_line._name,
             'view_mode': 'form',
-            'view_id': view_id,
-            'views': [(view_id, 'form')],
+            'view_id': view.id,
+            'views': [(view.id, 'form')],
             'res_id': order_line.id,
         }
-    
     
     def open_valuation(self, options, params):
         date_to = options['date']['date_to'] + ' ' + str(time.max.strftime("%H:%M:%S.%f"))

@@ -10,7 +10,6 @@ from datetime import datetime, time, timedelta
 
 MAX_NAME_LENGTH = 50
 
-
 class StockValuationReport(models.Model):
     _name = "stock.valuation.report"
     _inherit = ["stock.valuation.layer"]
@@ -125,13 +124,6 @@ class StockValuationReportCustomHandle(models.AbstractModel):
     ####################################################
     # INHERIT METHOD
     ####################################################
-    # def _get_custom_display_config(self):
-    #     return {
-    #         "components": {
-    #             "AccountReportFilters": "stock_reports.StockReportFilters",
-    #         },
-    #     }
-
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
         """ Generates lines dynamically for reports that require a custom processing which cannot be handled
         by regular report engines.
@@ -200,7 +192,7 @@ class StockValuationReportCustomHandle(models.AbstractModel):
         lines.append({
             'id': report._get_generic_line_id(None, None, markup='total'),
             'name': _('Total'),
-            'level': 1,
+            'level': 0,
             'columns': columns,
         })
 
@@ -242,26 +234,33 @@ class StockValuationReportCustomHandle(models.AbstractModel):
         options["stock_valuation_type"] = previous_options.get('stock_valuation_type') or "all"
         options["stock_grouping"] = "valuation"
         options['stock_grouping_field'] = previous_options.get('stock_grouping_field') or "account_id"
+        options["track_inventory"] = previous_options.get("track_inventory", True)
+        options["none_track_inventory"] = previous_options.get("none_track_inventory", False)
 
     ####################################################
     # BUSSINESS METHOD
     ####################################################
     def _get_values(self, report, options, expanded_line_ids=[], offset=0, limit=None):
         # " Get the data from the database "
-        # self.env['stock.valuation.layer'].check_access('read')
         self.env['stock.valuation.report'].check_access('read')
 
         # prepare parameter 
         query_cluase = {
             "select_cluase": "",
-            "where_cluase": "valuation.company_id in %(company_ids)s AND valuation.stock_move_date <= %(date_to)s",
+            "where_cluase": "valuation.company_id in %(company_ids)s AND valuation.stock_move_date <= %(date_to)s ",
             "groupby_cluase": "",
             "orderby_cluase": "",
         }
         
         company_ids = report.get_report_company_ids(options) # tuple(company for company in report.get_report_company_ids(options))
         date_to = options['date']['date_to'] + ' ' + str(time.max.strftime("%H:%M:%S.%f"))
-        date_from = options['date']['date_from'] + ' ' + str(time.max.strftime("%H:%M:%S.%f"))
+        date_from = options['date']['date_from'] + ' ' + str(time.min.strftime("%H:%M:%S.%f"))
+
+        # Options Filter by tracked inventory 
+        if options.get("track_inventory") and not options.get("none_track_inventory"):
+            query_cluase["where_cluase"] += " AND template.is_storable = 't' "
+        elif not options.get("track_inventory") and options.get("none_track_inventory"):
+            query_cluase["where_cluase"] += " AND (template.is_storable = 'f' OR template.is_storable IS null) "
 
         # Options Filter by product and Categories
         selected_products, selected_product_categories = report._get_options_product(options)
@@ -464,7 +463,8 @@ class StockValuationReportCustomHandle(models.AbstractModel):
             'parent_id': parent_line_id,
             'unfoldable': False,
             'unfolded': False,
-            'caret_options': 'stock.reports'
+            'caret_options': 'stock.reports',
+            'maxCharacters': MAX_NAME_LENGTH,
         }
         # set title
         if len(name) > MAX_NAME_LENGTH:

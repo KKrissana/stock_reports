@@ -3,7 +3,7 @@
 
     <record id="stock_valuation_report" model="account.report">
         <field name="name">Stock Valuation</field>
-        <field name="filter_hierarchy">optional</field>
+        <field name="filter_hierarchy">never</field>
         <field name="filter_unfold_all" eval="True"/>
         <field name="filter_show_draft" eval="False"/>
         <field name="filter_period_comparison" eval="False"/>
@@ -13,11 +13,6 @@
         <field name="custom_handler_model_id" ref="model_stock_valuation_report_handler"/>
         <field name="load_more_limit" eval="80"/>
         <field name="column_ids">
-            <!-- <record id="stock_valuation_report_product_name" model="account.report.column">
-                <field name="name">Product</field>
-                <field name="expression_label">product_name</field>
-                <field name="figure_type">string</field>
-            </record> -->
             <record id="stock_valuation_report_product_code" model="account.report.column">
                 <field name="name">Reference</field>
                 <field name="expression_label">product_code</field>

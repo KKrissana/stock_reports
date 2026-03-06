@@ -4,44 +4,66 @@
     <!-- Inherit AccountReportFilterExtraOptions -->
     <t t-name="stock_reports.StockMoveFilterExtraOptions" t-inherit="account_reports.AccountReportFilterExtraOptions" t-inherit-mode="extension">
         <xpath expr="//t[@t-if='controller.options.integer_rounding']" position="after">
- 
-            <t t-if="['incoming', 'outgoing'].includes(controller.options['stock_grouping'])">
+            <t t-if="['incoming', 'outgoing', 'valuation'].includes(controller.options['stock_grouping'])">
                 <div class="dropdown-divider" />
+                <DropdownItem
+                    class="{ 'selected': controller.options.track_inventory }"
+                    onSelected="() => this.filterClicked({ optionKey: 'track_inventory', reload: true})"
+                    closingMode="'none'" >
+                    Track Inventory
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.none_track_inventory }"
+                    onSelected="() => this.filterClicked({ optionKey: 'none_track_inventory', reload: true})"
+                    closingMode="'none'" >
+                    No Track Inventory
+                </DropdownItem>
+            </t>
+            
+            <t t-if="['incoming', 'outgoing'].includes(controller.options['stock_grouping'])">
+
+                <div class="dropdown-divider" />
+                 <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
+                    class="{ 'selected': controller.options.sale_to_customer }"
+                    onSelected="() => this.filterClicked({ optionKey: 'sale_to_customer', reload: true})"
+                    closingMode="'none'" >
+                    Sale
+                </DropdownItem>
                 <DropdownItem t-if="['incoming'].includes(controller.options['stock_grouping'])"
-                    class="{ 'selected': controller.options.receipt_stock }"
-                    onSelected="() => this.filterClicked({ optionKey: 'receipt_stock', reload: true})"
+                    class="{ 'selected': controller.options.purchase_to_stock }"
+                    onSelected="() => this.filterClicked({ optionKey: 'purchase_to_stock', reload: true})"
                     closingMode="'none'" >
-                    Receipts
-                </DropdownItem>
-                <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
-                    class="{ 'selected': controller.options.delivery_stock }"
-                    onSelected="() => this.filterClicked({ optionKey: 'delivery_stock', reload: true})"
-                    closingMode="'none'" >
-                    Deliveries
+                    Purchase
                 </DropdownItem>
                 <DropdownItem
-                    class="{ 'selected': controller.options.return_from_customer }"
-                    onSelected="() => this.filterClicked({ optionKey: 'return_from_customer', reload: true})"
+                    class="{ 'selected': controller.options.mrp_operation }"
+                    onSelected="() => this.filterClicked({ optionKey: 'mrp_operation', reload: true})"
                     closingMode="'none'" >
-                    Returns from customer
-                </DropdownItem>
-                <DropdownItem t-if="['outgoing'].includes(controller.options['stock_grouping'])"
-                    class="{ 'selected': controller.options.return_from_production }"
-                    onSelected="() => this.filterClicked({ optionKey: 'return_from_production', reload: true})"
-                    closingMode="'none'" >
-                    Returns from production
+                    Production
                 </DropdownItem>
                 <DropdownItem
-                    class="{ 'selected': controller.options.return_to_vendor }"
-                    onSelected="() => this.filterClicked({ optionKey: 'return_to_vendor', reload: true})"
+                    class="{ 'selected': controller.options.vendor_return }"
+                    onSelected="() => this.filterClicked({ optionKey: 'vendor_return', reload: true})"
                     closingMode="'none'" >
-                    Returns to vendor
+                    Vendor Return
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.customer_return }"
+                    onSelected="() => this.filterClicked({ optionKey: 'customer_return', reload: true})"
+                    closingMode="'none'" >
+                    Customer Return
+                </DropdownItem>
+                <DropdownItem
+                    class="{ 'selected': controller.options.mrp_operation_return }"
+                    onSelected="() => this.filterClicked({ optionKey: 'mrp_operation_return', reload: true})"
+                    closingMode="'none'" >
+                    Production Return
                 </DropdownItem>
                 <DropdownItem
                     class="{ 'selected': controller.options.inventory_loss }"
                     onSelected="() => this.filterClicked({ optionKey: 'inventory_loss', reload: true})"
                     closingMode="'none'" >
-                    Inventory loss/adjustment 
+                    Inventory Adjustment 
                 </DropdownItem>
             </t>
 
