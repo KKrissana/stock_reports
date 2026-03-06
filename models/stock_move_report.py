@@ -265,7 +265,7 @@ class StockMoveReportCustomHandle(models.AbstractModel):
                 group_lines.update(self._build_line_groupby_dic(account.id, account.code, account.name, res, reverse=reverse))
             group_lines.update(self._build_line_groupby_dic(0, "", "Undefined", results.filtered(lambda r: not r.stock_account_id), reverse=reverse))
         elif options["stock_grouping_field"] == "analytic": 
-            analytics = results.mapped("stock_account_id.analytic_account_id")
+            analytics = results.mapped("stock_move_id.analytic_account_id")
             for analytic in analytics:
                 res = results.filtered(lambda r: r.stock_move_id.analytic_account_id == analytic)
                 group_lines.update(self._build_line_groupby_dic(analytic.id, analytic.code, analytic.name, res, reverse=reverse))
@@ -696,6 +696,7 @@ class StockOutgoingReportCustomHandle(models.AbstractModel):
         # compute machine and remark for outgoing report:
         line.update({"machine": ""})
         if hasattr(line["stock_move"], "maintenance_id") and line["stock_move"].maintenance_id:
+            machine = ""
             mro = line["stock_move"].maintenance_id.with_user(SUPERUSER_ID)
             if line["picking"] and hasattr(line["picking"], "requisition_picking_id") and line["picking"].requisition_picking_id:
                 machine = (line["picking"].requisition_picking_id.reason_for_requisition or "").strip()
