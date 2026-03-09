@@ -246,6 +246,18 @@ class StockMoveReportCustomHandle(models.AbstractModel):
         # Options Show Stock Account
         if options.get("show_stock_account"):
             line.update({"stock_account": result.stock_account_id and result.stock_account_id.display_name or ""})
+
+        # Options Show Counterpart Account
+        if options.get("show_counterpart_account"):
+            counterpart_account = ""
+            if result.account_move_id:
+                if result.quantity > 0:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
+                else:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.debit > 0)[0]
+                counterpart_account = move_line.account_id.display_name
+            line.update({"counterpart_account": counterpart_account})
+
         return line
 
     def _build_line_groupby(self, group_lines, results, options, reverse=False) -> dict:
@@ -257,11 +269,13 @@ class StockMoveReportCustomHandle(models.AbstractModel):
                 group_lines.update(self._build_line_groupby_dic(account.id, account.code, account.name, res, reverse=reverse))
             group_lines.update(self._build_line_groupby_dic(0, "", "Undefined", results.filtered(lambda r: not r.stock_account_id), reverse=reverse))
         elif options["stock_grouping_field"] == "analytic": 
-            analytics = results.mapped("stock_move_id.analytic_account_id")
-            for analytic in analytics:
-                res = results.filtered(lambda r: r.stock_move_id.analytic_account_id == analytic)
+            result_analytics = results.filtered(lambda r: r.stock_move_id and r.stock_move_id.analytic_account_id)
+            result_undefined = results.filtered(lambda r: r.stock_move_id and not r.stock_move_id.analytic_account_id) | results.filtered(lambda r: not r.stock_move_id)
+            # analytics = result_analytics.mapped(lambda r: r.stock_move_id.analytic_account_id)
+            for analytic in result_analytics.mapped("stock_move_id.analytic_account_id"):
+                res = result_analytics.filtered(lambda r: r.stock_move_id and r.stock_move_id.analytic_account_id == analytic)
                 group_lines.update(self._build_line_groupby_dic(analytic.id, analytic.code, analytic.name, res, reverse=reverse))
-            group_lines.update(self._build_line_groupby_dic(0, "", "Undefined", results.filtered(lambda r: not r.stock_move_id.analytic_account_id), reverse=reverse))
+            group_lines.update(self._build_line_groupby_dic(0, "", "Undefined", result_undefined, reverse=reverse))
         else:
             group_lines.update(self._build_line_groupby_dic(0, "no_group", "No Grouping", results, reverse=reverse))
         return group_lines
@@ -274,19 +288,21 @@ class StockMoveReportCustomHandle(models.AbstractModel):
         :param results: The recordset of stock.valuation.report that contains the values to display in the lines of the group
         :return: A dict containing the values of the line to display.
         """
-        value = sum(results.mapped("value"))
-        quantity = sum(results.mapped("quantity"))
-        if reverse:
-            value *= -1
-            quantity *= -1
-        return {
-            group_id: {
-                "group_code": group_code,
-                "group_name": group_name, 
-                "quantity": quantity,
-                "value": value,
+        if results:
+            value = sum(results.mapped("value"))
+            quantity = sum(results.mapped("quantity"))
+            if reverse:
+                value *= -1
+                quantity *= -1
+            return {
+                group_id: {
+                    "group_code": group_code,
+                    "group_name": group_name, 
+                    "quantity": quantity,
+                    "value": value,
+                }
             }
-        }
+        return {}
 
     def _build_line_markup(self, line_dic) -> tuple:
         """ This method is used to build the markup of the line.
@@ -352,7 +368,7 @@ class StockMoveReportCustomHandle(models.AbstractModel):
             domain.append(("stock_move_id.analytic_account_id", "in", options["analytic_accounts"]))
 
         # Options Filter by Analytic and line expanded by analytic
-        if getattr(self.env["stock.move"], "analytic_account_id", False):
+        if hasattr(self.env["stock.move"], "analytic_account_id"):
             if options["stock_grouping_field"] == "analytic" and expanded_line_ids:
                 domain.append(("stock_move_id.analytic_account_id", "in", expanded_line_ids))
             elif options["analytic_accounts"]:
@@ -582,17 +598,7 @@ class StockIncomingReportCustomHandle(models.AbstractModel):
         # Options Show Invoice/Delivery Note
         if options.get("show_inv_note"):
             line.update({"inv_note": line["picking"] and getattr(line["picking"], "bill_inv_no", "") or ""})
-        
-        # Options Show Counterpart Account
-        if options.get("show_counterpart_account"):
-            counterpart_account = ""
-            if result.account_move_id:
-                if result.quantity > 0:
-                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.debit > 0)[0]
-                else:
-                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
-                counterpart_account = move_line.account_id.display_name
-            line.update({"counterpart_account": counterpart_account})
+
         return line
        
 class StockOutgoingReportCustomHandle(models.AbstractModel):
@@ -756,16 +762,5 @@ class StockOutgoingReportCustomHandle(models.AbstractModel):
             if not partner and line["purchase_line"]:
                 partner = line["purchase_line"].partner_id.name or ""
             line.update({"partner": partner})
-
-        # Options Show Counterpart Account
-        if options.get("show_counterpart_account"):
-            counterpart_account = ""
-            if result.account_move_id:
-                if result.quantity > 0:
-                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.debit > 0)[0]
-                else:
-                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
-                counterpart_account = move_line.account_id.display_name
-            line.update({"counterpart_account": counterpart_account})
 
         return line
