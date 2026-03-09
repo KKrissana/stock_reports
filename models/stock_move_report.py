@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 
 from datetime import time
 
-MAX_NAME_LENGTH = 50
+MAX_NAME_LENGTH = 40
 
 class StockMoveReportCustomHandle(models.AbstractModel):
     _name = "stock.move.report.handler"
@@ -246,14 +246,6 @@ class StockMoveReportCustomHandle(models.AbstractModel):
         # Options Show Stock Account
         if options.get("show_stock_account"):
             line.update({"stock_account": result.stock_account_id and result.stock_account_id.display_name or ""})
-
-        # Options Show Counterpart Account
-        if options.get("show_counterpart_account"):
-            counterpart_account = ""
-            if result.account_move_id:
-                move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
-                counterpart_account = move_line.account_id.display_name
-            line.update({"counterpart_account": counterpart_account})
         return line
 
     def _build_line_groupby(self, group_lines, results, options, reverse=False) -> dict:
@@ -355,11 +347,16 @@ class StockMoveReportCustomHandle(models.AbstractModel):
         elif options["stock_valuation_type"] == "real_time":
             domain.append(("stock_account_id", "!=", False))
 
+        # Options Filter by analytic account
+        if options.get("analytic_accounts"):
+            domain.append(("stock_move_id.analytic_account_id", "in", options["analytic_accounts"]))
+
         # Options Filter by Analytic and line expanded by analytic
         if getattr(self.env["stock.move"], "analytic_account_id", False):
-            if options["analytic_accounts"] \
-                or (options["stock_grouping_field"] == "analytic" and expanded_line_ids):
+            if options["stock_grouping_field"] == "analytic" and expanded_line_ids:
                 domain.append(("stock_move_id.analytic_account_id", "in", expanded_line_ids))
+            elif options["analytic_accounts"]:
+                 domain.append(("stock_move_id.analytic_account_id", "in", options["analytic_accounts"]))
 
         # Options Filter by line expanded by account_id
         if options["stock_grouping_field"] == "account_id" and expanded_line_ids:
@@ -525,11 +522,11 @@ class StockIncomingReportCustomHandle(models.AbstractModel):
     def _get_column_max_characters(self) -> dict:
         return {
             "origin": 25,
-            "partner": 40,
+            "partner": 30,
             "analytic_account": 20,
             "stock_account": 20,
             "counterpart_account": 20,
-            "remark": 40,
+            "remark": 30,
         }
     
     def _build_line_dic(self, options, result) -> dict:
@@ -586,9 +583,18 @@ class StockIncomingReportCustomHandle(models.AbstractModel):
         if options.get("show_inv_note"):
             line.update({"inv_note": line["picking"] and getattr(line["picking"], "bill_inv_no", "") or ""})
         
+        # Options Show Counterpart Account
+        if options.get("show_counterpart_account"):
+            counterpart_account = ""
+            if result.account_move_id:
+                if result.quantity > 0:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.debit > 0)[0]
+                else:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
+                counterpart_account = move_line.account_id.display_name
+            line.update({"counterpart_account": counterpart_account})
         return line
        
-
 class StockOutgoingReportCustomHandle(models.AbstractModel):
     _name = "stock.outgoing.report.handler"
     _inherit = "stock.move.report.handler"
@@ -679,11 +685,12 @@ class StockOutgoingReportCustomHandle(models.AbstractModel):
     def _get_column_max_characters(self) -> dict:
         return {
             "origin": 25,
-            "partner": 40,
+            "partner": 30,
+            "machine": 20, 
             "analytic_account": 20,
             "stock_account": 20,
             "counterpart_account": 20,
-            "remark": 40,
+            "remark": 30,
         }
     
     def _build_line_dic(self, options, result) -> dict:
@@ -715,8 +722,8 @@ class StockOutgoingReportCustomHandle(models.AbstractModel):
                 requisition_lines = requisition.requisition_line_ids.filtered(lambda r: r.product_id.id == line["stock_move"].product_id.id)
                 if line["picking"].requisition_vehicle_id:
                     vehicle = line["picking"].requisition_vehicle_id.with_user(SUPERUSER_ID)
-                    machine = "%s: %s" % (vehicle.asset_ref, vehicle.display_name) if hasattr(vehicle, "asset_ref") and vehicle.asset_ref else vehicle.display_name
-                    requisition_lines.filtered(lambda r: r.vehicle_id.id == vehicle.id)
+                    line["machine"] = "%s: %s" % (vehicle.asset_ref, vehicle.display_name) if hasattr(vehicle, "asset_ref") and vehicle.asset_ref else vehicle.display_name
+                    requisition_lines = requisition_lines.filtered(lambda r: r.vehicle_id.id == vehicle.id)
                 line_remark = ", ".join(requisition_lines.mapped(lambda r: r.remark or ''))
                 line["remark"] = line_remark or requisition.reason_for_requisition or ""
         
@@ -749,5 +756,16 @@ class StockOutgoingReportCustomHandle(models.AbstractModel):
             if not partner and line["purchase_line"]:
                 partner = line["purchase_line"].partner_id.name or ""
             line.update({"partner": partner})
+
+        # Options Show Counterpart Account
+        if options.get("show_counterpart_account"):
+            counterpart_account = ""
+            if result.account_move_id:
+                if result.quantity > 0:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.debit > 0)[0]
+                else:
+                    move_line = result.account_move_id.line_ids.filtered(lambda l: l.product_id.id == result.product_id.id and l.credit > 0)[0]
+                counterpart_account = move_line.account_id.display_name
+            line.update({"counterpart_account": counterpart_account})
 
         return line
