@@ -157,15 +157,15 @@ class AgedStockCustomHandle(models.AbstractModel):
         }
 
         # Domain Filters for product.product 
-        domain = [("is_storable", "=", True)]
+        domain = [("is_storable", "=", True), ("qty_available", "!=", 0)]
 
-        # Options Filter by product and Categories
+        # Options Filter by Product Categories
         selected_products, selected_product_categories = report._get_options_product(options)
         if selected_products:
             domain.append(("id", "in", selected_products))
-        else: # Case not filter product, get all product available qty
-            domain += self.env["product.product"].with_context(product_context)._search_qty_available("!=", 0)
-        
+        # else: # Case not filter product, get all product available qty
+        #     # domain += self.env["product.product"].with_context(product_context)._search_qty_available("!=", 0)
+
         if selected_product_categories:
             domain.append(("categ_id", "in", selected_product_categories))
 
@@ -174,11 +174,14 @@ class AgedStockCustomHandle(models.AbstractModel):
             domain.append(("orderpoint_ids", "=", False))
         elif options["aged_stock_product_control"] == "orderpoint":
             domain.append(("orderpoint_ids.company_id", "=", self.env.company.id))
-        
+
         # TODO: Still optimization possible when searching virtual quantities
         # Order the search on `id` to prevent the default order on the product name which slows
         # down the search because of the join on the translation table to get the translated names.
-        products = self.env["product.product"].with_context(product_context).search(domain, offset=offset, limit=limit, order='id')
+        products = self.env["product.product"].with_context(product_context).search(
+            domain + ["|", ("active", "=", False), ("active", "!=", False)], 
+            offset=offset, limit=limit, order='id'
+        )
 
         # Filters for stock.move.line
         domain = [("date", "<=", as_of_datetime), ("product_id", "in", products.ids)]
